@@ -42,6 +42,14 @@
             border-radius: 8px;
             overflow-x: auto;
         }
+       .output-img {
+           width: 100%;
+           max-width: 900px;
+           display: block;
+           margin: 20px auto;
+           border-radius: 8px;
+           box-shadow: 0 3px 10px #ccc;
+       }
 
         .use {
             background-color: #eef2f7;
