@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Retail SQL Analysis</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background-color: #f4f6f8;
+            color: #222;
+        }
+
+        header {
+            background-color: #182848;
+            color: white;
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        header h1 {
+            margin: 0;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1000px;
+            margin: 30px auto;
+        }
+
+        .card {
+            background-color: white;
+            padding: 25px;
+            margin-bottom: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px #ccc;
+        }
+
+        h2 {
+            color: #182848;
+        }
+
+        pre {
+            background-color: #222;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+        }
+
+        .use {
+            background-color: #eef2f7;
+            padding: 12px;
+            margin-bottom: 20px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>Retail SQL Analysis</h1>
+    <p>SQL Mini Project | PostgreSQL</p>
+</header>
+
+<div class="container">
+
+    <div class="card">
+        <h2>Project Overview</h2>
+
+        <p>
+            This project analyzes retail sales data using SQL.
+            The project uses Orders, Customers and Products tables
+            to analyze sales, customers, regions, categories and products.
+        </p>
+    </div>
+
+
+    <div class="card">
+        <h2>Tables Used</h2>
+
+        <ul>
+            <li>Orders</li>
+            <li>Customers</li>
+            <li>Products</li>
+        </ul>
+    </div>
+
+
+    <div class="card">
+        <h2>SQL Concepts Used</h2>
+
+        <ul>
+            <li>SELECT</li>
+            <li>JOIN</li>
+            <li>GROUP BY</li>
+            <li>HAVING</li>
+            <li>Aggregate Functions</li>
+            <li>Subqueries</li>
+            <li>CASE</li>
+            <li>CTE</li>
+            <li>Window Functions</li>
+            <li>RANK()</li>
+        </ul>
+    </div>
+
+
+    <!-- DAY 1 -->
+
+    <div class="card">
+        <h2>Day 1 – Basic SQL</h2>
+
+        <pre>
+SELECT * FROM Orders;
+        </pre>
+
+        <div class="use">
+            <b>Use:</b> Displays all records from the Orders table.
+        </div>
+    </div>
+
+
+    <!-- DAY 2 -->
+
+    <div class="card">
+        <h2>Day 2 – SQL Data Analysis</h2>
+
+        <pre>
+SELECT orderid, customerid, productid, quantity, sales
+FROM Orders;
+        </pre>
+
+        <div class="use">
+            <b>Use:</b> Displays important order details for analysis.
+        </div>
+    </div>
+
+
+    <!-- DAY 3 -->
+
+    <div class="card">
+        <h2>Day 3 – Category-wise Sales</h2>
+
+        <pre>
+SELECT
+    p.category,
+    SUM(o.sales) AS TotalSales
+FROM Orders o
+JOIN Products p
+ON o.productid = p.productid
+GROUP BY p.category;
+        </pre>
+
+        <div class="use">
+            <b>Use:</b> Calculates total sales for each product category.
+        </div>
+
+
+        <pre>
+SELECT
+    p.category,
+    COUNT(o.orderid) AS OrderCount
+FROM Orders o
+JOIN Products p
+ON o.productid = p.productid
+GROUP BY p.category
+HAVING COUNT(o.orderid) > 20;
+        </pre>
+
+        <div class="use">
+            <b>Use:</b> Finds categories having more than 20 orders.
+        </div>
+    </div>
+
+
+    <!-- DAY 4 -->
+
+    <div class="card">
+        <h2>Day 4 – JOIN Operations</h2>
+
+        <pre>
+SELECT
+    o.orderid,
+    c.customername,
+    c.region
+FROM Orders o
+INNER JOIN Customers c
+ON o.customerid = c.customerid;
+        </pre>
+
+        <div class="use">
+            <b>Use:</b> Displays orders with matching customer details.
+        </div>
+
+
+        <pre>
+SELECT
+    c.customerid,
+    c.customername,
+    c.region
+FROM Customers c
+LEFT JOIN Orders o
+ON c.customerid = o.customerid
+WHERE o.orderid IS NULL;
+        </pre>
+
+        <div class="use">
+            <b>Use:</b> Finds customers who have never placed an order.
+        </div>
+    </div>
+
+
+    <!-- DAY 5 -->
+
+    <div class="card">
+        <h2>Day 5 – Subquery and CASE</h2>
+
+        <pre>
+SELECT orderid, sales
+FROM Orders
+WHERE sales > (
+    SELECT AVG(sales)
+    FROM Orders
+);
+        </pre>
+
+        <div class="use">
+            <b>Use:</b> Finds orders having sales greater than average sales.
+        </div>
+
+
+        <pre>
+SELECT
+    orderid,
+    sales,
+    CASE
+        WHEN sales >= 10000 THEN 'High Value'
+        ELSE 'Regular'
+    END AS OrderStatus
+FROM Orders;
+        </pre>
+
+        <div class="use">
+            <b>Use:</b> Classifies orders as High Value or Regular.
+        </div>
+    </div>
+
+
+    <!-- DAY 6 -->
+
+    <div class="card">
+        <h2>Day 6 – CTE and Window Functions</h2>
+
+        <pre>
+WITH SalesByPerson AS (
+    SELECT
+        c.customername AS salesperson,
+        SUM(o.sales) AS totalsales
+    FROM Orders o
+    INNER JOIN Customers c
+    ON o.customerid = c.customerid
+    GROUP BY c.customername
+)
+
+SELECT
+    salesperson,
+    totalsales,
+    RANK() OVER (
+        ORDER BY totalsales DESC
+    ) AS salesrank
+FROM SalesByPerson
+ORDER BY salesrank;
+        </pre>
+
+        <div class="use">
+            <b>Use:</b> Calculates total sales and ranks customers.
+        </div>
+
+
+        <pre>
+SELECT
+    c.region,
+    o.orderid,
+    o.sales,
+
+    SUM(o.sales) OVER (
+        PARTITION BY c.region
+        ORDER BY o.orderid
+    ) AS runningtotal
+
+FROM Orders o
+INNER JOIN Customers c
+ON o.customerid = c.customerid
+
+ORDER BY c.region, o.orderid;
+        </pre>
+
+        <div class="use">
+            <b>Use:</b> Calculates running sales total for each region.
+        </div>
+    </div>
+
+
+    <!-- DAY 7 -->
+
+    <div class="card">
+        <h2>Day 7 – Retail SQL Mini Project</h2>
+
+        <h3>1. Main JOIN Analysis</h3>
+
+        <pre>
+SELECT
+    o.orderid,
+    o.orderdate,
+    c.customername,
+    c.region,
+    p.productname,
+    p.category,
+    o.quantity,
+    o.sales
+
+FROM Orders o
+
+INNER JOIN Customers c
+ON o.customerid = c.customerid
+
+INNER JOIN Products p
+ON o.productid = p.productid;
+        </pre>
+
+
+        <h3>2. KPI Analysis</h3>
+
+        <pre>
+SELECT
+    SUM(sales) AS TotalSales,
+    COUNT(orderid) AS TotalOrders,
+    AVG(sales) AS AverageOrderValue,
+    MAX(sales) AS HighestOrderValue
+FROM Orders;
+        </pre>
+
+
+        <h3>3. Sales by Region and Category</h3>
+
+        <pre>
+SELECT
+    c.region,
+    p.category,
+    SUM(o.sales) AS TotalSales
+
+FROM Orders o
+
+INNER JOIN Customers c
+ON o.customerid = c.customerid
+
+INNER JOIN Products p
+ON o.productid = p.productid
+
+GROUP BY c.region, p.category
+
+ORDER BY TotalSales DESC;
+        </pre>
+
+
+        <h3>4. Monthly Sales</h3>
+
+        <pre>
+SELECT
+    DATE_TRUNC('month', orderdate) AS Month,
+    SUM(sales) AS TotalSales
+
+FROM Orders
+
+GROUP BY DATE_TRUNC('month', orderdate)
+
+ORDER BY Month;
+        </pre>
+
+
+        <h3>5. Top 5 Products</h3>
+
+        <pre>
+SELECT
+    p.productname,
+    SUM(o.sales) AS TotalSales
+
+FROM Orders o
+
+INNER JOIN Products p
+ON o.productid = p.productid
+
+GROUP BY p.productname
+
+ORDER BY TotalSales DESC
+
+LIMIT 5;
+        </pre>
+
+
+        <h3>6. Top 5 Customers / Salespersons</h3>
+
+        <pre>
+SELECT
+    c.customername AS Salesperson,
+    SUM(o.sales) AS TotalSales
+
+FROM Orders o
+
+INNER JOIN Customers c
+ON o.customerid = c.customerid
+
+GROUP BY c.customername
+
+ORDER BY TotalSales DESC
+
+LIMIT 5;
+        </pre>
+
+    </div>
+
+
+    <!-- INSIGHTS -->
+
+    <div class="card">
+        <h2>Business Insights</h2>
+
+        <ol>
+            <li>Overall sales performance can be measured using total sales and total orders.</li>
+
+            <li>Regional analysis helps identify regions generating higher sales.</li>
+
+            <li>Category analysis helps compare Electronics and Accessories sales.</li>
+
+            <li>Top product analysis identifies products generating the highest sales.</li>
+
+            <li>Monthly sales analysis helps understand sales trends over time.</li>
+        </ol>
+    </div>
+
+</div>
+
+
+<footer>
+    <p>Retail SQL Analysis | SQL Mini Project</p>
+</footer>
+
+</body>
+</html>
